@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional CV Maker</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- html2pdf.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+
+    /* A4 Aspect Ratio Simulation for Live Preview */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      max-height: 297mm;
+      background: white;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
+      overflow: hidden;
+      position: relative;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    /* Responsive Scale transform for preview container to fit screens cleanly */
+    .preview-scaler {
+      transform-origin: top center;
+      width: 210mm;
+      transform: scale(0.38); /* Default mobile scale */
+    }
+
+    @media (min-width: 480px) {
+      .preview-scaler {
+        transform: scale(0.52);
+      }
+    }
+
+    @media (min-width: 640px) {
+      .preview-scaler {
+        transform: scale(0.68);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .preview-scaler {
+        transform: scale(0.62);
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .preview-scaler {
+        transform: scale(0.72);
+      }
+    }
+
+    /* Theme Styles for Classic Template */
+    .theme-monochrome {
+      --header-bg: #0f172a;
+      --header-text: #ffffff;
+      --sidebar-bg: #f8fafc;
+      --accent: #334155;
+      --accent-badge-bg: #e2e8f0;
+      --accent-badge-text: #0f172a;
+      --text-main: #0f172a;
+      --border-color: #cbd5e1;
+    }
+    .theme-blue {
+      --header-bg: #1e3a8a;
+      --header-text: #ffffff;
+      --sidebar-bg: #f0f9ff;
+      --accent: #0284c7;
+      --accent-badge-bg: #e0f2fe;
+      --accent-badge-text: #0369a1;
+      --text-main: #0f172a;
+      --border-color: #bae6fd;
+    }
+    .theme-charcoal {
+      --header-bg: #262626;
+      --header-text: #ffffff;
+      --sidebar-bg: #f5f5f5;
+      --accent: #525252;
+      --accent-badge-bg: #e5e5e5;
+      --accent-badge-text: #171717;
+      --text-main: #171717;
+      --border-color: #d4d4d4;
+    }
+    .theme-teal {
+      --header-bg: #0f766e;
+      --header-text: #ffffff;
+      --sidebar-bg: #f0fdf4;
+      --accent: #0d9488;
+      --accent-badge-bg: #ccfbf1;
+      --accent-badge-text: #0f766e;
+      --text-main: #064e3b;
+      --border-color: #99f6e4;
+    }
+    .theme-burgundy {
+      --header-bg: #7f1d1d;
+      --header-text: #ffffff;
+      --sidebar-bg: #fff1f2;
+      --accent: #be123c;
+      --accent-badge-bg: #ffe4e6;
+      --accent-badge-text: #9f1239;
+      --text-main: #4c0519;
+      --border-color: #fecdd3;
+    }
+
+    /* Print / PDF generation specific styles */
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .a4-page {
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+      }
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header / Navigation Bar -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-brand-500 text-white p-2 rounded-lg">
+          <i class="fa-solid fa-file-contract text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight leading-none">Make My CV</h1>
+          <p class="text-xs text-slate-400">Professional & ATS Resume Builder</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <button id="reset-btn" onclick="confirmReset()" class="px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate-left"></i> <span class="hidden sm:inline">Reset Form</span>
+        </button>
+        <button onclick="scrollToPreview()" class="md:hidden px-3 py-1.5 text-xs font-semibold bg-brand-500 text-white rounded-md shadow hover:bg-brand-600 transition">
+          <i class="fa-solid fa-eye mr-1"></i> Preview
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- LEFT COLUMN: Form Inputs (6 Columns on Desktop) -->
+    <div class="lg:col-span-6 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
+      <div class="bg-slate-50 border-b border-slate-200 p-4 flex justify-between items-center">
+        <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-brand-500"></i> Edit CV Details
+        </h2>
+        <span class="text-xs text-slate-500">* Full Name is required</span>
+      </div>
+
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-8 flex-1 max-h-[80vh] lg:max-h-[calc(100vh-140px)]">
+        
+        <!-- SECTION 1: Personal Information -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-user text-xs"></i> Personal Details
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+              <input type="text" id="input-fullname" oninput="updateCV()" placeholder="e.g. Alex Morgan" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" required>
+            </div>
+
+            <!-- Profile Photo Upload -->
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Profile Photo (Optional)</label>
+              <div class="flex items-center gap-4">
+                <div class="relative w-16 h-16 rounded-full overflow-hidden bg-slate-100 border border-slate-300 flex items-center justify-center shrink-0">
+                  <img id="photo-preview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+                  <i id="photo-placeholder" class="fa-solid fa-user text-slate-400 text-2xl"></i>
+                </div>
+                <div class="flex flex-wrap gap-2 items-center">
+                  <label class="cursor-pointer bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-3 py-1.5 text-xs rounded-lg font-medium shadow-sm transition inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-upload text-slate-500"></i> Upload Photo
+                    <input type="file" id="input-photo" accept="image/jpeg,image/png,image/webp" onchange="handlePhotoUpload(event)" class="hidden">
+                  </label>
+                  <button id="remove-photo-btn" onclick="removePhoto()" type="button" class="hidden text-xs text-red-600 hover:text-red-700 font-medium px-2 py-1.5">
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Supports JPG, PNG, WEBP. Photo automatically omitted in ATS layout.</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+              <input type="text" id="input-phone" oninput="updateCV()" placeholder="+1 (555) 000-1234" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+              <input type="email" id="input-email" oninput="updateCV()" placeholder="alex.morgan@example.com" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Present Address</label>
+              <input type="text" id="input-address" oninput="updateCV()" placeholder="New York, NY, USA" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Professional Summary / About Me</label>
+              <textarea id="input-summary" oninput="updateCV()" rows="3" placeholder="Dedicated professional with expertise in delivering high-impact solutions..." class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"></textarea>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Social Links (LinkedIn, Facebook, Portfolio, etc.)</label>
+              <input type="text" id="input-socials" oninput="updateCV()" placeholder="linkedin.com/in/alexmorgan | facebook.com/alexmorgan" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: Education -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-graduation-cap text-xs"></i> Education
+            </h3>
+            <button type="button" onclick="addEducationEntry()" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 px-2.5 py-1 rounded border border-brand-200 transition flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> Add Education
+            </button>
+          </div>
+          <div id="education-container" class="space-y-4"></div>
+        </section>
+
+        <!-- SECTION 3: Experience -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-briefcase text-xs"></i> Experience
+            </h3>
+            <button type="button" onclick="addExperienceEntry()" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 px-2.5 py-1 rounded border border-brand-200 transition flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> Add Experience
+            </button>
+          </div>
+          <div id="experience-container" class="space-y-4"></div>
+        </section>
+
+        <!-- SECTION 4: Skills -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-gears text-xs"></i> Skills
+            </h3>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Add Skill Tags</label>
+            <div class="flex gap-2 mb-2">
+              <input type="text" id="skill-input" onkeydown="handleSkillKeyDown(event)" placeholder="e.g. JavaScript, UI/UX, Management" class="flex-1 text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+              <button type="button" onclick="addSkillFromInput()" class="bg-brand-500 hover:bg-brand-600 text-white font-medium px-4 py-2 rounded-lg text-xs transition flex items-center gap-1">
+                <i class="fa-solid fa-plus"></i> Add
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Type a skill and press Enter or click Add.</p>
+            <div id="skills-box-container" class="flex flex-col gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg min-h-[48px]"></div>
+          </div>
+        </section>
+
+        <!-- SECTION 5: Languages -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-language text-xs"></i> Languages (Max 4)
+            </h3>
+            <button id="add-lang-btn" type="button" onclick="addLanguageEntry()" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 px-2.5 py-1 rounded border border-brand-200 transition flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> Add Language
+            </button>
+          </div>
+          <div id="languages-container" class="space-y-3"></div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Live CV Preview & Color Themes (6 Columns on Desktop) -->
+    <div id="preview-section" class="lg:col-span-6 flex flex-col space-y-4">
+      
+      <!-- Preview Controls Header -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-4">
+        
+        <!-- Template Switcher Tabs -->
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3 flex-wrap gap-2">
+          <div class="flex items-center bg-slate-100 p-1 rounded-lg">
+            <button id="tab-classic" onclick="switchTemplate('classic')" class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition">
+              Template 1: Classic CV
+            </button>
+            <button id="tab-ats" onclick="switchTemplate('ats')" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition">
+              Template 2: ATS-Friendly
+            </button>
+          </div>
+
+          <!-- PDF Export Button -->
+          <button id="download-btn" onclick="downloadPDF()" class="bg-brand-500 hover:bg-brand-600 text-white font-semibold px-4 py-1.5 rounded-lg text-xs shadow-md transition flex items-center gap-2">
+            <i class="fa-solid fa-file-pdf text-sm"></i> <span id="download-btn-text">Download Classic CV — PDF</span>
+          </button>
+        </div>
+
+        <!-- Theme Color Selection (5 Options) -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-2">Select Color Theme:</label>
+          <div class="grid grid-cols-5 gap-2">
+            
+            <button type="button" onclick="setTheme('theme-monochrome')" class="theme-option ring-2 ring-brand-500 p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Classic Monochrome">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-slate-900"></div>
+                <div class="w-1/2 bg-slate-200"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Monochrome</span>
+            </button>
+
+            <button type="button" onclick="setTheme('theme-blue')" class="theme-option p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Professional Blue">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-blue-900"></div>
+                <div class="w-1/2 bg-sky-400"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Blue</span>
+            </button>
+
+            <button type="button" onclick="setTheme('theme-charcoal')" class="theme-option p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Elegant Charcoal">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-neutral-800"></div>
+                <div class="w-1/2 bg-neutral-400"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Charcoal</span>
+            </button>
+
+            <button type="button" onclick="setTheme('theme-teal')" class="theme-option p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Corporate Teal">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-teal-800"></div>
+                <div class="w-1/2 bg-teal-400"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Teal</span>
+            </button>
+
+            <button type="button" onclick="setTheme('theme-burgundy')" class="theme-option p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Burgundy Classic">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-red-900"></div>
+                <div class="w-1/2 bg-rose-400"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Burgundy</span>
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Live Preview Render Area -->
+      <div class="flex-1 overflow-x-auto bg-slate-200 p-4 rounded-xl border border-slate-300 flex justify-center items-start min-h-[600px]">
+        <div id="scaler-wrapper" class="preview-scaler transition-transform">
+          
+          <!-- CLASSIC TEMPLATE PREVIEW -->
+          <div id="cv-classic" class="a4-page theme-monochrome text-slate-900 flex flex-col">
+            
+            <header class="p-7 flex items-center gap-7" style="background-color: var(--header-bg); color: var(--header-text);">
+              <div id="cv-classic-photo-container" class="w-32 h-32 rounded-full overflow-hidden border-4 border-white/90 bg-white/10 shrink-0 shadow-md flex items-center justify-center">
+                <img id="cv-classic-photo" src="" alt="Profile Photo" class="w-full h-full object-cover hidden">
+                <i id="cv-classic-photo-icon" class="fa-solid fa-user text-5xl text-white/40"></i>
+              </div>
+              <div class="flex-1">
+                <h1 id="cv-classic-name" class="text-3xl font-extrabold tracking-tight uppercase">Alex Morgan</h1>
+                <p id="cv-classic-title" class="text-sm tracking-widest uppercase opacity-85 mt-1 font-normal"></p>
+              </div>
+            </header>
+
+            <div class="flex-1 flex">
+              <aside class="w-1/3 p-6 space-y-6 border-r" style="background-color: var(--sidebar-bg); border-color: var(--border-color);">
+                <div id="cv-classic-about-sec" class="hidden space-y-2.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1" style="color: var(--accent); border-color: var(--border-color);">About Me</h3>
+                  <p id="cv-classic-summary" class="text-xs leading-relaxed text-slate-700"></p>
+                </div>
+
+                <div id="cv-classic-contact-sec" class="space-y-2.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1" style="color: var(--accent); border-color: var(--border-color);">Contact</h3>
+                  <div class="space-y-2 text-xs text-slate-700">
+                    <p id="cv-classic-phone" class="hidden flex items-center gap-2 font-medium"><i class="fa-solid fa-phone text-xs" style="color: var(--accent);"></i> <span></span></p>
+                    <p id="cv-classic-email" class="hidden flex items-center gap-2 break-all font-medium"><i class="fa-solid fa-envelope text-xs" style="color: var(--accent);"></i> <span></span></p>
+                    <p id="cv-classic-address" class="hidden flex items-center gap-2 font-medium"><i class="fa-solid fa-location-dot text-xs" style="color: var(--accent);"></i> <span></span></p>
+                    <p id="cv-classic-socials" class="hidden flex items-center gap-2 break-all font-medium"><i class="fa-solid fa-globe text-xs" style="color: var(--accent);"></i> <span></span></p>
+                  </div>
+                </div>
+
+                <div id="cv-classic-skills-sec" class="hidden space-y-2.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1" style="color: var(--accent); border-color: var(--border-color);">Skills</h3>
+                  <div id="cv-classic-skills-list" class="flex flex-col gap-1.5"></div>
+                </div>
+
+                <div id="cv-classic-lang-sec" class="hidden space-y-2.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1" style="color: var(--accent); border-color: var(--border-color);">Languages</h3>
+                  <div id="cv-classic-lang-list" class="space-y-1.5 text-xs text-slate-700"></div>
+                </div>
+              </aside>
+
+              <main class="w-2/3 p-7 space-y-7 bg-white">
+                <div id="cv-classic-edu-sec" class="hidden space-y-3.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1 text-slate-900" style="color: var(--accent); border-color: var(--accent);">Education</h3>
+                  <div id="cv-classic-edu-list" class="space-y-4 text-xs"></div>
+                </div>
+
+                <div id="cv-classic-exp-sec" class="hidden space-y-3.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1 text-slate-900" style="color: var(--accent); border-color: var(--accent);">Experience</h3>
+                  <div id="cv-classic-exp-list" class="space-y-4 text-xs"></div>
+                </div>
+              </main>
+            </div>
+          </div>
+
+          <!-- ATS-FRIENDLY TEMPLATE PREVIEW -->
+          <div id="cv-ats" class="a4-page text-slate-900 p-8 space-y-6 hidden font-sans">
+            <header class="border-b-2 border-slate-800 pb-4 text-center space-y-1.5">
+              <h1 id="cv-ats-name" class="text-3xl font-extrabold uppercase tracking-tight text-slate-900">Alex Morgan</h1>
+              <div id="cv-ats-contact" class="text-xs font-medium text-slate-700 flex flex-wrap justify-center gap-x-3 gap-y-1"></div>
+            </header>
+
+            <section id="cv-ats-about-sec" class="hidden space-y-1.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Professional Summary</h2>
+              <p id="cv-ats-summary" class="text-xs text-slate-700 leading-normal"></p>
+            </section>
+
+            <section id="cv-ats-exp-sec" class="hidden space-y-2.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Experience</h2>
+              <div id="cv-ats-exp-list" class="space-y-3 text-xs"></div>
+            </section>
+
+            <section id="cv-ats-edu-sec" class="hidden space-y-2.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Education</h2>
+              <div id="cv-ats-edu-list" class="space-y-2.5 text-xs"></div>
+            </section>
+
+            <section id="cv-ats-skills-sec" class="hidden space-y-1.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Skills</h2>
+              <p id="cv-ats-skills-text" class="text-xs text-slate-700 leading-relaxed font-medium"></p>
+            </section>
+
+            <section id="cv-ats-lang-sec" class="hidden space-y-1.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Languages</h2>
+              <p id="cv-ats-lang-text" class="text-xs text-slate-700 font-medium"></p>
+            </section>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Share Website & Footer Section -->
+  <footer class="bg-slate-900 text-slate-300 mt-12 no-print border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+      <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-700 text-center max-w-2xl mx-auto space-y-4">
+        <h3 class="text-base font-bold text-white flex items-center justify-center gap-2">
+          <i class="fa-solid fa-share-nodes text-brand-500"></i> Share This CV Maker
+        </h3>
+        <p class="text-xs text-slate-400">Help friends and colleagues build professional, ATS-ready resumes in seconds.</p>
+        <div class="flex items-center justify-center gap-3">
+          <button onclick="copyWebsiteLink()" class="bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-2 rounded-lg text-xs transition flex items-center gap-2">
+            <i class="fa-solid fa-copy"></i> Copy Website Link
+          </button>
+          <button onclick="shareWebsite()" class="bg-brand-500 hover:bg-brand-600 text-white font-medium px-4 py-2 rounded-lg text-xs transition flex items-center gap-2">
+            <i class="fa-solid fa-share"></i> Share Website
+          </button>
+        </div>
+        <div id="share-toast" class="hidden text-xs text-emerald-400 font-medium transition">
+          <i class="fa-solid fa-check-circle mr-1"></i> Website link copied to clipboard!
+        </div>
+      </div>
+      <div class="text-center text-xs text-slate-500 space-y-2">
+        <p>100% Client-Side & Private. Your personal details never leave your browser.</p>
+        <p>&copy; 2026 @mhb__rana. Built for career success.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript Application Logic placeholder for your scripts -->
+  <script>
+    let photoBase64 = null;
+    let activeTemplate = 'classic';
+    let activeTheme = 'theme-monochrome';
+    let educationEntries = [];
+    let experienceEntries = [];
+    let languageEntries = [];
+    let skillsList = ['JavaScript', 'HTML5', 'CSS3', 'UI/UX Design', 'Project Management'];
+
+    window.onload = function() {
+      addEducationEntry();
+      addExperienceEntry();
+      addLanguageEntry();
+      renderSkillBoxes();
+      updateCV();
+    };
+
+    function confirmReset() {
+      if (confirm("Are you sure you want to reset the form? All entered information will be cleared.")) {
+        document.getElementById('input-fullname').value = '';
+        document.getElementById('input-phone').value = '';
+        document.getElementById('input-email').value = '';
+        document.getElementById('input-address').value = '';
+        document.getElementById('input-summary').value = '';
+        document.getElementById('input-socials').value = '';
+        skillsList = [];
+        renderSkillBoxes();
+        removePhoto();
+        educationEntries = [];
+        experienceEntries = [];
+        languageEntries = [];
+        document.getElementById('education-container').innerHTML = '';
+        document.getElementById('experience-container').innerHTML = '';
+        document.getElementById('languages-container').innerHTML = '';
+        addEducationEntry();
+        addExperienceEntry();
+        addLanguageEntry();
+        updateCV();
+      }
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        alert("Please upload a valid image format (JPG, PNG, or WEBP).");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        photoBase64 = e.target.result;
+        const photoPreview = document.getElementById('photo-preview');
+        photoPreview.src = photoBase64;
+        photoPreview.classList.remove('hidden');
+        document.getElementById('photo-placeholder').classList.add('hidden');
+        document.getElementById('remove-photo-btn').classList.remove('hidden');
+        updateCV();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removePhoto() {
+      photoBase64 = null;
+      document.getElementById('input-photo').value = '';
+      const photoPreview = document.getElementById('photo-preview');
+      photoPreview.src = '';
+      photoPreview.classList.add('hidden');
+      document.getElementById('photo-placeholder').classList.remove('hidden');
+      document.getElementById('remove-photo-btn').classList.add('hidden');
+      updateCV();
+    }
+
+    function scrollToPreview() {
+      document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function switchTemplate(templateName) {
+      activeTemplate = templateName;
+      const btnClassic = document.getElementById('tab-classic');
+      const btnAts = document.getElementById('tab-ats');
+      const cvClassic = document.getElementById('cv-classic');
+      const cvAts = document.getElementById('cv-ats');
+      const downloadText = document.getElementById('download-btn-text');
+
+      if (templateName === 'classic') {
+        btnClassic.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
+        btnAts.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+        cvClassic.classList.remove('hidden');
+        cvAts.classList.add('hidden');
+        downloadText.innerText = "Download Classic CV — PDF";
+      } else {
+        btnAts.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
+        btnClassic.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+        cvAts.classList.remove('hidden');
+        cvClassic.classList.add('hidden');
+        downloadText.innerText = "Download ATS Resume — PDF";
+      }
+    }
+
+    function setTheme(themeName) {
+      activeTheme = themeName;
+      const options = document.querySelectorAll('.theme-option');
+      options.forEach(opt => opt.classList.remove('ring-2', 'ring-brand-500'));
+      event.currentTarget.classList.add('ring-2', 'ring-brand-500');
+      
+      const classicElem = document.getElementById('cv-classic');
+      classicElem.className = `a4-page ${activeTheme} text-slate-900 flex flex-col`;
+    }
+
+    function renderSkillBoxes() {
+      const container = document.getElementById('skills-box-container');
+      container.innerHTML = '';
+      if (skillsList.length === 0) {
+        container.innerHTML = '<span class="text-xs text-slate-400 italic">No skills added yet.</span>';
+        return;
+      }
+      skillsList.forEach((skill, index) => {
+        const tag = document.createElement('div');
+        tag.className = 'flex items-center justify-between bg-white border border-slate-200 px-3 py-1.5 rounded-md shadow-xs text-xs';
+        tag.innerHTML = `<span class="font-medium text-slate-700">${skill}</span>
+                         <button type="button" onclick="removeSkill(${index})" class="text-slate-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark"></i></button>`;
+        container.appendChild(tag);
+      });
+      updateCV();
+    }
+
+    function addSkillFromInput() {
+      const input = document.getElementById('skill-input');
+      const val = input.value.trim();
+      if (val && !skillsList.includes(val)) {
+        skillsList.push(val);
+        input.value = '';
+        renderSkillBoxes();
+      }
+    }
+
+    function handleSkillKeyDown(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addSkillFromInput();
+      }
+    }
+
+    function removeSkill(index) {
+      skillsList.splice(index, 1);
+      renderSkillBoxes();
+    }
+
+    function addEducationEntry() {
+      const id = Date.now() + Math.random();
+      educationEntries.push({ id, degree: '', institution: '', year: '', grade: '' });
+      renderEducationInputs();
+    }
+
+    function renderEducationInputs() {
+      const container = document.getElementById('education-container');
+      container.innerHTML = '';
+      educationEntries.forEach((edu, idx) => {
+        const div = document.createElement('div');
+        div.className = 'p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-3 relative';
+        div.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-600">Education #${idx + 1}</span>
+            <button type="button" onclick="removeEducationEntry(${edu.id})" class="text-xs text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input type="text" placeholder="Degree/Major" value="${edu.degree}" oninput="updateEducationField(${edu.id}, 'degree', this.value)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none">
+            <input type="text" placeholder="Institution/University" value="${edu.institution}" oninput="updateEducationField(${edu.id}, 'institution', this.value)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none">
+            <input type="text" placeholder="Years (e.g. 2018 - 2022)" value="${edu.year}" oninput="updateEducationField(${edu.id}, 'year', this.value)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none">
+            <input type="text" placeholder="Grade/GPA (Optional)" value="${edu.grade}" oninput="updateEducationField(${edu.id}, 'grade', this.value)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none">
+          </div>`;
+        container.appendChild(div);
+      });
+      updateCV();
+    }
+
+    function updateEducationField(id, field, value) {
+      const entry = educationEntries.find(e => e.id === id);
+      if (entry) {
+        entry[field] = value;
+        updateCV();
+      }
+    }
+
+    function removeEducationEntry(id) {
+      educationEntries = educationEntries.filter(e => e.id !== id);
+      renderEducationInputs();
+    }
+
+    function addExperienceEntry() {
+      const id = Date.now() + Math.random();
+      experienceEntries.push({ id, role: '', company: '', duration: '', desc: '' });
+      renderExperienceInputs();
+    }
+
+    function renderExperienceInputs() {
+      const container = document.getElementById('experience-container');
+      container.innerHTML = '';
+      experienceEntries.forEach((exp, idx) => {
+        const div = document.createElement('div');
+        div.className = 'p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-3 relative';
+        div.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-600">Experience #${idx + 1}</span>
+            <button type="button" onclick="removeExperienceEntry(${exp.id})" class="text-xs text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input type="text" placeholder="Job Title" value="${exp.role}" oninput="updateExperienceField(${exp.id}, 'role', this.value)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none">
+            <input type="text" placeholder="Company Name" value="${exp.company}" oninput="updateExperienceField(${exp.id}, 'company', this.value)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none">
+            <input type="text" placeholder="Duration (e.g. 2022 - Present)" value="${exp.duration}" oninput="updateExperienceField(${exp.id}, 'duration', this.value)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none sm:col-span-2">
+            <textarea placeholder="Key responsibilities and achievements..." rows="2" oninput="updateExperienceField(${exp.id}, 'desc', this.value)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none sm:col-span-2">${exp.desc}</textarea>
+          </div>`;
+        container.appendChild(div);
+      });
+      updateCV();
+    }
+
+    function updateExperienceField(id, field, value) {
+      const entry = experienceEntries.find(e => e.id === id);
+      if (entry) {
+        entry[field] = value;
+        updateCV();
+      }
+    }
+
+    function removeExperienceEntry(id) {
+      experienceEntries = experienceEntries.filter(e => e.id !== id);
+      renderExperienceInputs();
+    }
+
+    function addLanguageEntry() {
+      if (languageEntries.length >= 4) return;
+      const id = Date.now() + Math.random();
+      languageEntries.push({ id, name: '', level: 'Fluent' });
+      renderLanguageInputs();
+    }
+
+    function renderLanguageInputs() {
+      const container = document.getElementById('languages-container');
+      container.innerHTML = '';
+      languageEntries.forEach((lang) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-2';
+        div.innerHTML = `
+          <input type="text" placeholder="Language (e.g. English)" value="${lang.name}" oninput="updateLanguageField(${lang.id}, 'name', this.value)" class="flex-1 text-xs px-2.5 py-1.5 border border-slate-300 rounded-md outline-none">
+          <select onchange="updateLanguageField(${lang.id}, 'level', this.value)" class="text-xs px-2 py-1.5 border border-slate-300 rounded-md outline-none bg-white">
+            <option value="Native" ${lang.level === 'Native' ? 'selected' : ''}>Native</option>
+            <option value="Fluent" ${lang.level === 'Fluent' ? 'selected' : ''}>Fluent</option>
+            <option value="Intermediate" ${lang.level === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+            <option value="Basic" ${lang.level === 'Basic' ? 'selected' : ''}>Basic</option>
+          </select>
+          <button type="button" onclick="removeLanguageEntry(${lang.id})" class="text-xs text-red-500 hover:text-red-700 px-1"><i class="fa-solid fa-trash"></i></button>`;
+        container.appendChild(div);
+      });
+      if (languageEntries.length >= 4) {
+        document.getElementById('add-lang-btn').classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        document.

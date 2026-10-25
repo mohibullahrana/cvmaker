@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional CV Maker</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- html2pdf.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+
+    /* A4 Aspect Ratio Simulation for Live Preview */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      max-height: 297mm;
+      background: white;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
+      overflow: hidden;
+      position: relative;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    /* Scale transform for preview container to fit screens cleanly */
+    .preview-scaler {
+      transform-origin: top center;
+    }
+
+    /* Theme Styles for Classic Template */
+    /* Theme 1: Classic Monochrome */
+    .theme-monochrome {
+      --header-bg: #0f172a;
+      --header-text: #ffffff;
+      --sidebar-bg: #f8fafc;
+      --accent: #334155;
+      --accent-badge-bg: #e2e8f0;
+      --accent-badge-text: #0f172a;
+      --text-main: #0f172a;
+      --border-color: #cbd5e1;
+    }
+    /* Theme 2: Professional Blue */
+    .theme-blue {
+      --header-bg: #1e3a8a;
+      --header-text: #ffffff;
+      --sidebar-bg: #f0f9ff;
+      --accent: #0284c7;
+      --accent-badge-bg: #e0f2fe;
+      --accent-badge-text: #0369a1;
+      --text-main: #0f172a;
+      --border-color: #bae6fd;
+    }
+    /* Theme 3: Elegant Charcoal */
+    .theme-charcoal {
+      --header-bg: #262626;
+      --header-text: #ffffff;
+      --sidebar-bg: #f5f5f5;
+      --accent: #525252;
+      --accent-badge-bg: #e5e5e5;
+      --accent-badge-text: #171717;
+      --text-main: #171717;
+      --border-color: #d4d4d4;
+    }
+    /* Theme 4: Corporate Teal */
+    .theme-teal {
+      --header-bg: #0f766e;
+      --header-text: #ffffff;
+      --sidebar-bg: #f0fdf4;
+      --accent: #0d9488;
+      --accent-badge-bg: #ccfbf1;
+      --accent-badge-text: #0f766e;
+      --text-main: #064e3b;
+      --border-color: #99f6e4;
+    }
+    /* Theme 5: Burgundy Classic */
+    .theme-burgundy {
+      --header-bg: #7f1d1d;
+      --header-text: #ffffff;
+      --sidebar-bg: #fff1f2;
+      --accent: #be123c;
+      --accent-badge-bg: #ffe4e6;
+      --accent-badge-text: #9f1239;
+      --text-main: #4c0519;
+      --border-color: #fecdd3;
+    }
+
+    /* Print / PDF generation specific styles */
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .a4-page {
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+      }
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header / Navigation Bar -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-brand-500 text-white p-2 rounded-lg">
+          <i class="fa-solid fa-file-contract text-xl"></i>c
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight leading-none">Make My CV</h1>
+          <p class="text-xs text-slate-400">Professional & ATS Resume Builder</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <button id="reset-btn" onclick="confirmReset()" class="px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate-left"></i> <span class="hidden sm:inline">Reset Form</span>
+        </button>
+        <button onclick="scrollToPreview()" class="md:hidden px-3 py-1.5 text-xs font-semibold bg-brand-500 text-white rounded-md shadow hover:bg-brand-600 transition">
+          <i class="fa-solid fa-eye mr-1"></i> Preview
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- LEFT COLUMN: Form Inputs (6 Columns on Desktop) -->
+    <div class="lg:col-span-6 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
+      <div class="bg-slate-50 border-b border-slate-200 p-4 flex justify-between items-center">
+        <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-brand-500"></i> Edit CV Details
+        </h2>
+        <span class="text-xs text-slate-500">* Full Name is required</span>
+      </div>
+
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-8 flex-1 max-h-[80vh] lg:max-h-[calc(100vh-140px)]">
+        
+        <!-- SECTION 1: Personal Information -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-user text-xs"></i> Personal Details
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+              <input type="text" id="input-fullname" oninput="updateCV()" placeholder="e.g. Alex Morgan" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" required>
+            </div>
+
+            <!-- Profile Photo Upload -->
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Profile Photo (Optional)</label>
+              <div class="flex items-center gap-4">
+                <div class="relative w-16 h-16 rounded-full overflow-hidden bg-slate-100 border border-slate-300 flex items-center justify-center shrink-0">
+                  <img id="photo-preview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+                  <i id="photo-placeholder" class="fa-solid fa-user text-slate-400 text-2xl"></i>
+                </div>
+                <div class="flex flex-wrap gap-2 items-center">
+                  <label class="cursor-pointer bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-3 py-1.5 text-xs rounded-lg font-medium shadow-sm transition inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-upload text-slate-500"></i> Upload Photo
+                    <input type="file" id="input-photo" accept="image/jpeg,image/png,image/webp" onchange="handlePhotoUpload(event)" class="hidden">
+                  </label>
+                  <button id="remove-photo-btn" onclick="removePhoto()" type="button" class="hidden text-xs text-red-600 hover:text-red-700 font-medium px-2 py-1.5">
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Supports JPG, PNG, WEBP. Photo automatically omitted in ATS layout.</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+              <input type="text" id="input-phone" oninput="updateCV()" placeholder="+1 (555) 000-1234" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+              <input type="email" id="input-email" oninput="updateCV()" placeholder="alex.morgan@example.com" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Present Address</label>
+              <input type="text" id="input-address" oninput="updateCV()" placeholder="New York, NY, USA" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Professional Summary / About Me</label>
+              <textarea id="input-summary" oninput="updateCV()" rows="3" placeholder="Dedicated professional with expertise in delivering high-impact solutions..." class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"></textarea>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Social Links (LinkedIn, Facebook, Portfolio, etc.)</label>
+              <input type="text" id="input-socials" oninput="updateCV()" placeholder="linkedin.com/in/alexmorgan | facebook.com/alexmorgan" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            </div>
+          </div>
+        </section>
+
+
+        <!-- SECTION 2: Education -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-graduation-cap text-xs"></i> Education
+            </h3>
+            <button type="button" onclick="addEducationEntry()" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 px-2.5 py-1 rounded border border-brand-200 transition flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> Add Education
+            </button>
+          </div>
+
+          <div id="education-container" class="space-y-4">
+            <!-- Dynamic education entries rendered here -->
+          </div>
+        </section>
+
+
+        <!-- SECTION 3: Experience -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-briefcase text-xs"></i> Experience
+            </h3>
+            <button type="button" onclick="addExperienceEntry()" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 px-2.5 py-1 rounded border border-brand-200 transition flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> Add Experience
+            </button>
+          </div>
+
+          <div id="experience-container" class="space-y-4">
+            <!-- Dynamic experience entries rendered here -->
+          </div>
+        </section>
+
+
+        <!-- SECTION 4: Skills (Interactive Skill Tag Box) -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-gears text-xs"></i> Skills
+            </h3>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Add Skill Tags</label>
+            <div class="flex gap-2 mb-2">
+              <input type="text" id="skill-input" onkeydown="handleSkillKeyDown(event)" placeholder="e.g. JavaScript, UI/UX, Management" class="flex-1 text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+              <button type="button" onclick="addSkillFromInput()" class="bg-brand-500 hover:bg-brand-600 text-white font-medium px-4 py-2 rounded-lg text-xs transition flex items-center gap-1">
+                <i class="fa-solid fa-plus"></i> Add
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Type a skill and press Enter or click Add.</p>
+
+            <!-- Interactive Skill Tags Container -->
+            <div id="skills-box-container" class="flex flex-col gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg min-h-[48px]">
+              <!-- Dynamic skill badges rendered here -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- SECTION 5: Languages -->
+        <section class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-600 flex items-center gap-2">
+              <i class="fa-solid fa-language text-xs"></i> Languages (Max 4)
+            </h3>
+            <button id="add-lang-btn" type="button" onclick="addLanguageEntry()" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 px-2.5 py-1 rounded border border-brand-200 transition flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> Add Language
+            </button>
+          </div>
+
+          <div id="languages-container" class="space-y-3">
+            <!-- Dynamic language entries rendered here -->
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+
+    <!-- RIGHT COLUMN: Live CV Preview & Color Themes (6 Columns on Desktop) -->
+    <div id="preview-section" class="lg:col-span-6 flex flex-col space-y-4">
+      
+      <!-- Preview Controls Header -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-4">
+        
+        <!-- Template Switcher Tabs -->
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3 flex-wrap gap-2">
+          <div class="flex items-center bg-slate-100 p-1 rounded-lg">
+            <button id="tab-classic" onclick="switchTemplate('classic')" class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition">
+              Template 1: Classic CV
+            </button>
+            <button id="tab-ats" onclick="switchTemplate('ats')" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition">
+              Template 2: ATS-Friendly
+            </button>
+          </div>
+
+          <!-- PDF Export Button -->
+          <button id="download-btn" onclick="downloadPDF()" class="bg-brand-500 hover:bg-brand-600 text-white font-semibold px-4 py-1.5 rounded-lg text-xs shadow-md transition flex items-center gap-2">
+            <i class="fa-solid fa-file-pdf text-sm"></i> <span id="download-btn-text">Download Classic CV — PDF</span>
+          </button>
+        </div>
+
+        <!-- Theme Color Selection (5 Options) -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-2">Select Color Theme:</label>
+          <div class="grid grid-cols-5 gap-2">
+            
+            <button type="button" onclick="setTheme('theme-monochrome')" class="theme-option ring-2 ring-brand-500 p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Classic Monochrome">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-slate-900"></div>
+                <div class="w-1/2 bg-slate-200"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Monochrome</span>
+            </button>
+
+            <button type="button" onclick="setTheme('theme-blue')" class="theme-option p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Professional Blue">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-blue-900"></div>
+                <div class="w-1/2 bg-sky-400"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Blue</span>
+            </button>
+
+            <button type="button" onclick="setTheme('theme-charcoal')" class="theme-option p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Elegant Charcoal">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-neutral-800"></div>
+                <div class="w-1/2 bg-neutral-400"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Charcoal</span>
+            </button>
+
+            <button type="button" onclick="setTheme('theme-teal')" class="theme-option p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Corporate Teal">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-teal-800"></div>
+                <div class="w-1/2 bg-teal-400"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Teal</span>
+            </button>
+
+            <button type="button" onclick="setTheme('theme-burgundy')" class="theme-option p-1.5 rounded-lg border border-slate-200 text-left flex flex-col items-center hover:bg-slate-50 transition" title="Burgundy Classic">
+              <div class="w-full h-4 rounded flex overflow-hidden mb-1 border border-slate-300">
+                <div class="w-1/2 bg-red-900"></div>
+                <div class="w-1/2 bg-rose-400"></div>
+              </div>
+              <span class="text-[10px] font-medium text-slate-700 truncate w-full text-center">Burgundy</span>
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Live Preview Render Area -->
+      <div class="flex-1 overflow-x-auto bg-slate-200 p-4 rounded-xl border border-slate-300 flex justify-center items-start min-h-[600px]">
+        <div id="scaler-wrapper" class="preview-scaler transform scale-[0.55] sm:scale-[0.7] lg:scale-[0.62] xl:scale-[0.72] transition-transform origin-top">
+          
+          <!-- CLASSIC TEMPLATE PREVIEW -->
+          <div id="cv-classic" class="a4-page theme-monochrome text-slate-900 flex flex-col">
+            
+            <!-- Header with Larger Circle Profile Photo -->
+            <header class="p-7 flex items-center gap-7" style="background-color: var(--header-bg); color: var(--header-text);">
+              <div id="cv-classic-photo-container" class="w-32 h-32 rounded-full overflow-hidden border-4 border-white/90 bg-white/10 shrink-0 shadow-md flex items-center justify-center">
+                <img id="cv-classic-photo" src="" alt="Profile Photo" class="w-full h-full object-cover hidden">
+                <i id="cv-classic-photo-icon" class="fa-solid fa-user text-5xl text-white/40"></i>
+              </div>
+              <div class="flex-1">
+                <h1 id="cv-classic-name" class="text-3xl font-extrabold tracking-tight uppercase">Alex Morgan</h1>
+                <p id="cv-classic-title" class="text-sm tracking-widest uppercase opacity-85 mt-1 font-normal"></p>
+              </div>
+            </header>
+
+            <!-- Two-Column Body -->
+            <div class="flex-1 flex">
+              
+              <!-- Left Sidebar -->
+              <aside class="w-1/3 p-6 space-y-6 border-r" style="background-color: var(--sidebar-bg); border-color: var(--border-color);">
+                
+                <!-- About Me -->
+                <div id="cv-classic-about-sec" class="hidden space-y-2.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1" style="color: var(--accent); border-color: var(--border-color);">About Me</h3>
+                  <p id="cv-classic-summary" class="text-xs leading-relaxed text-slate-700"></p>
+                </div>
+
+                <!-- Contact -->
+                <div id="cv-classic-contact-sec" class="space-y-2.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1" style="color: var(--accent); border-color: var(--border-color);">Contact</h3>
+                  <div class="space-y-2 text-xs text-slate-700">
+                    <p id="cv-classic-phone" class="hidden flex items-center gap-2 font-medium"><i class="fa-solid fa-phone text-xs" style="color: var(--accent);"></i> <span></span></p>
+                    <p id="cv-classic-email" class="hidden flex items-center gap-2 break-all font-medium"><i class="fa-solid fa-envelope text-xs" style="color: var(--accent);"></i> <span></span></p>
+                    <p id="cv-classic-address" class="hidden flex items-center gap-2 font-medium"><i class="fa-solid fa-location-dot text-xs" style="color: var(--accent);"></i> <span></span></p>
+                    <p id="cv-classic-socials" class="hidden flex items-center gap-2 break-all font-medium"><i class="fa-solid fa-globe text-xs" style="color: var(--accent);"></i> <span></span></p>
+                  </div>
+                </div>
+
+                <!-- Skills (Rendered as Box Badges) -->
+                <div id="cv-classic-skills-sec" class="hidden space-y-2.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1" style="color: var(--accent); border-color: var(--border-color);">Skills</h3>
+                  <div id="cv-classic-skills-list" class="flex flex-col gap-1.5">
+                    <!-- Skill pill boxes -->
+                  </div>
+                </div>
+
+                <!-- Languages -->
+                <div id="cv-classic-lang-sec" class="hidden space-y-2.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1" style="color: var(--accent); border-color: var(--border-color);">Languages</h3>
+                  <div id="cv-classic-lang-list" class="space-y-1.5 text-xs text-slate-700">
+                  </div>
+                </div>
+
+              </aside>
+
+              <!-- Main Right Content -->
+              <main class="w-2/3 p-7 space-y-7 bg-white">
+                
+                <!-- Education -->
+                <div id="cv-classic-edu-sec" class="hidden space-y-3.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1 text-slate-900" style="color: var(--accent); border-color: var(--accent);">Education</h3>
+                  <div id="cv-classic-edu-list" class="space-y-4 text-xs">
+                  </div>
+                </div>
+
+                <!-- Experience -->
+                <div id="cv-classic-exp-sec" class="hidden space-y-3.5">
+                  <h3 class="text-sm font-bold uppercase tracking-wider border-b-2 pb-1 text-slate-900" style="color: var(--accent); border-color: var(--accent);">Experience</h3>
+                  <div id="cv-classic-exp-list" class="space-y-4 text-xs">
+                  </div>
+                </div>
+
+              </main>
+
+            </div>
+
+          </div>
+
+
+          <!-- ATS-FRIENDLY TEMPLATE PREVIEW -->
+          <div id="cv-ats" class="a4-page text-slate-900 p-8 space-y-6 hidden font-sans">
+            
+            <!-- ATS Header -->
+            <header class="border-b-2 border-slate-800 pb-4 text-center space-y-1.5">
+              <h1 id="cv-ats-name" class="text-3xl font-extrabold uppercase tracking-tight text-slate-900">Alex Morgan</h1>
+              <div id="cv-ats-contact" class="text-xs font-medium text-slate-700 flex flex-wrap justify-center gap-x-3 gap-y-1">
+                <!-- Phone, Email, Address, Socials -->
+              </div>
+            </header>
+
+            <!-- Professional Summary -->
+            <section id="cv-ats-about-sec" class="hidden space-y-1.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Professional Summary</h2>
+              <p id="cv-ats-summary" class="text-xs text-slate-700 leading-normal"></p>
+            </section>
+
+            <!-- Experience -->
+            <section id="cv-ats-exp-sec" class="hidden space-y-2.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Experience</h2>
+              <div id="cv-ats-exp-list" class="space-y-3 text-xs">
+              </div>
+            </section>
+
+            <!-- Education -->
+            <section id="cv-ats-edu-sec" class="hidden space-y-2.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Education</h2>
+              <div id="cv-ats-edu-list" class="space-y-2.5 text-xs">
+              </div>
+            </section>
+
+            <!-- Skills -->
+            <section id="cv-ats-skills-sec" class="hidden space-y-1.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Skills</h2>
+              <p id="cv-ats-skills-text" class="text-xs text-slate-700 leading-relaxed font-medium"></p>
+            </section>
+
+            <!-- Languages -->
+            <section id="cv-ats-lang-sec" class="hidden space-y-1.5">
+              <h2 class="text-xs font-bold uppercase border-b border-slate-400 pb-0.5 text-slate-900">Languages</h2>
+              <p id="cv-ats-lang-text" class="text-xs text-slate-700 font-medium"></p>
+            </section>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- Share Website & Footer Section -->
+  <footer class="bg-slate-900 text-slate-300 mt-12 no-print border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+      
+      <!-- Share Section -->
+      <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-700 text-center max-w-2xl mx-auto space-y-4">
+        <h3 class="text-base font-bold text-white flex items-center justify-center gap-2">
+          <i class="fa-solid fa-share-nodes text-brand-500"></i> Share This CV Maker
+        </h3>
+        <p class="text-xs text-slate-400">Help friends and colleagues build professional, ATS-ready resumes in seconds.</p>
+        
+        <div class="flex items-center justify-center gap-3">
+          <button onclick="copyWebsiteLink()" class="bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-2 rounded-lg text-xs transition flex items-center gap-2">
+            <i class="fa-solid fa-copy"></i> Copy Website Link
+          </button>
+          <button onclick="shareWebsite()" class="bg-brand-500 hover:bg-brand-600 text-white font-medium px-4 py-2 rounded-lg text-xs transition flex items-center gap-2">
+            <i class="fa-solid fa-share"></i> Share Website
+          </button>
+        </div>
+        <div id="share-toast" class="hidden text-xs text-emerald-400 font-medium transition">
+          <i class="fa-solid fa-check-circle mr-1"></i> Website link copied to clipboard!
+        </div>
+      </div>
+
+      <!-- Footer Info & Privacy Notice -->
+      <div class="text-center text-xs text-slate-500 space-y-2">
+        <p>100% Client-Side & Private. Your personal details never leave your browser.</p>
+        <p>&copy; 2026 @mhb__rana. Built for career success.</p>
+      </div>
+
+    </div>
+  </footer>
+
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    // Application State
+    let photoBase64 = null;
+    let activeTemplate = 'classic';
+    let activeTheme = 'theme-monochrome';
+    let educationEntries = [];
+    let experienceEntries = [];
+    let languageEntries = [];
+    let skillsList = ['JavaScript', 'HTML5', 'CSS3', 'UI/UX Design', 'Project Management'];
+
+    // Initialize Default State on Load
+    window.onload = function() {
+      // Add default entries for quick starting
+      addEducationEntry();
+      addExperienceEntry();
+      addLanguageEntry();
+      
+      // Initial render sync
+      renderSkillBoxes();
+      updateCV();
+    };
+
+    // Confirm & Reset Form
+    function confirmReset() {
+      if (confirm("Are you sure you want to reset the form? All entered information will be cleared.")) {
+        document.getElementById('input-fullname').value = '';
+        document.getElementById('input-phone').value = '';
+        document.getElementById('input-email').value = '';
+        document.getElementById('input-address').value = '';
+        document.getElementById('input-summary').value = '';
+        document.getElementById('input-socials').value = '';
+        
+        skillsList = [];
+        renderSkillBoxes();
+        
+        removePhoto();
+        
+        educationEntries = [];
+        experienceEntries = [];
+        languageEntries = [];
+        
+        document.getElementById('education-container').innerHTML = '';
+        document.getElementById('experience-container').innerHTML = '';
+        document.getElementById('languages-container').innerHTML = '';
+        
+        addEducationEntry();
+        addExperienceEntry();
+        addLanguageEntry();
+        
+        updateCV();
+      }
+    }
+
+    // Photo Upload Handler
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        alert("Please upload a valid image format (JPG, PNG, or WEBP).");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        photoBase64 = e.target.result;
+        
+        // Show in form preview
+        const photoPreview = document.getElementById('photo-preview');
+        photoPreview.src = photoBase64;
+        photoPreview.classList.remove('hidden');
+        document.getElementById('photo-placeholder').classList.add('hidden');
+        document.getElementById('remove-photo-btn').classList.remove('hidden');
+        
+        updateCV();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Remove Photo
+    function removePhoto() {
+      photoBase64 = null;
+      document.getElementById('input-photo').value = '';
+      const photoPreview = document.getElementById('photo-preview');
+      photoPreview.src = '';
+      photoPreview.classList.add('hidden');
+      document.getElementById('photo-placeholder').classList.remove('hidden');
+      document.getElementById('remove-photo-btn').classList.add('hidden');
+      
+      updateCV();
+    }
+
+    // Skill Tag Box Logic
+    function handleSkillKeyDown(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addSkillFromInput();
+      }
+    }
+
+    function addSkillFromInput() {
+      const input = document.getElementById('skill-input');
+      const val = input.value.trim();
+      if (val && !skillsList.includes(val)) {
+        skillsList.push(val);
+        input.value = '';
+        renderSkillBoxes();
+        updateCV();
+      }
+    }
+
+    function removeSkill(index) {
+      skillsList.splice(index, 1);
+      renderSkillBoxes();
+      updateCV();
+    }
+
+    function renderSkillBoxes() {
+      const container = document.getElementById('skills-box-container');
+      if (skillsList.length === 0) {
+        container.innerHTML = `<span class="text-xs text-slate-400 italic">No skill tags added yet.</span>`;
+        return;
+      }
+      container.innerHTML = skillsList.map((skill, idx) => `
+        <span class="inline-flex items-center justify-between w-full px-2.5 py-1 bg-brand-50 text-brand-700 border border-brand-200 text-xs font-semibold rounded-md shadow-sm">
+          ${escapeHTML(skill)}
+          <button type="button" onclick="removeSkill(${idx})" class="text-brand-500 hover:text-red-600 focus:outline-none">
+            <i class="fa-solid fa-xmark text-[11px]"></i>
+          </button>
+        </span>
+      `).join('');
+    }
+
+    // Education Entry Handlers
+    function addEducationEntry() {
+      const id = 'edu_' + Date.now() + '_' + Math.random().toString(36).substring(2, 4);
+      const entry = { id, category: 'SSC', field1: '', field2: 'Science', field3: '', field4: '', field5: '' };
+      educationEntries.push(entry);
+      renderEducationInputs();
+      updateCV();
+    }
+
+    function removeEducationEntry(id) {
+      educationEntries = educationEntries.filter(e => e.id !== id);
+      renderEducationInputs();
+      updateCV();
+    }
+
+    function updateEduCategory(id, category) {
+      const entry = educationEntries.find(e => e.id === id);
+      if (entry) {
+        entry.category = category;
+        // Default group for SSC/HSC
+        if (category === 'SSC' || category === 'HSC') {
+          entry.field2 = 'Science';
+        } else {
+          entry.field2 = '';
+        }
+        entry.field1 = ''; entry.field3 = ''; entry.field4 = ''; entry.field5 = '';
+        renderEducationInputs();
+        updateCV();
+      }
+    }
+
+    function renderEducationInputs() {
+      const container = document.getElementById('education-container');
+      container.innerHTML = educationEntries.map((edu, idx) => {
+        return `
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-3 relative">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-600">Education #${idx + 1}</span>
+              <button type="button" onclick="removeEducationEntry('${edu.id}')" class="text-xs text-red-500 hover:text-red-700 font-medium">
+                <i class="fa-solid fa-trash-can mr-1"></i> Remove
+              </button>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Qualification Category</label>
+              <select onchange="updateEduCategory('${edu.id}', this.value)" class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-brand-500 outline-none">
+                <option value="SSC" ${edu.category === 'SSC' ? 'selected' : ''}>SSC</option>
+                <option value="HSC" ${edu.category === 'HSC' ? 'selected' : ''}>HSC</option>
+                <option value="Diploma" ${edu.category === 'Diploma' ? 'selected' : ''}>Diploma</option>
+                <option value="Undergraduate" ${edu.category === 'Undergraduate' ? 'selected' : ''}>Undergraduate</option>
+              </select>
+            </div>
+
+            ${renderEduFieldsHTML(edu)}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderEduFieldsHTML(edu) {
+      if (edu.category === 'SSC' || edu.category === 'HSC') {
+        return `
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-500">Passing Year</label>
+              <input type="text" value="${edu.field1}" oninput="updateEduVal('${edu.id}', 'field1', this.value)" placeholder="e.g. 2020" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Group</label>
+              <select onchange="updateEduVal('${edu.id}', 'field2', this.value)" class="w-full text-xs px-2 py-1 border rounded">
+                <option value="Science" ${edu.field2 === 'Science' || !edu.field2 ? 'selected' : ''}>Science</option>
+                <option value="Arts" ${edu.field2 === 'Arts' ? 'selected' : ''}>Arts</option>
+                <option value="Business Studies" ${edu.field2 === 'Business Studies' ? 'selected' : ''}>Business Studies</option>
+              </select>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-[10px] text-slate-500">Institution Name</label>
+              <input type="text" value="${edu.field3}" oninput="updateEduVal('${edu.id}', 'field3', this.value)" placeholder="e.g. Model High School / College" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">GPA</label>
+              <input type="text" value="${edu.field4}" oninput="updateEduVal('${edu.id}', 'field4', this.value)" placeholder="e.g. 5.00" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+          </div>
+        `;
+      } else if (edu.category === 'Diploma') {
+        return `
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-500">Passing Year</label>
+              <input type="text" value="${edu.field1}" oninput="updateEduVal('${edu.id}', 'field1', this.value)" placeholder="e.g. 2021" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Department Name</label>
+              <input type="text" value="${edu.field2}" oninput="updateEduVal('${edu.id}', 'field2', this.value)" placeholder="e.g. Computer Tech" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div class="col-span-2">
+              <label class="block text-[10px] text-slate-500">Institution Name</label>
+              <input type="text" value="${edu.field3}" oninput="updateEduVal('${edu.id}', 'field3', this.value)" placeholder="e.g. Polytechnic Institute" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Academic Session</label>
+              <input type="text" value="${edu.field4}" oninput="updateEduVal('${edu.id}', 'field4', this.value)" placeholder="e.g. 2017-18" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">CGPA</label>
+              <input type="text" value="${edu.field5}" oninput="updateEduVal('${edu.id}', 'field5', this.value)" placeholder="e.g. 3.85" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+          </div>
+        `;
+      } else if (edu.category === 'Undergraduate') {
+        return `
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-500">Degree Name</label>
+              <select onchange="updateEduVal('${edu.id}', 'field1', this.value)" class="w-full text-xs px-2 py-1 border rounded">
+                <option value="BSc" ${edu.field1 === 'BSc' || !edu.field1 ? 'selected' : ''}>BSc</option>
+                <option value="BBA" ${edu.field1 === 'BBA' ? 'selected' : ''}>BBA</option>
+                <option value="MBBS" ${edu.field1 === 'MBBS' ? 'selected' : ''}>MBBS</option>
+                <option value="BA" ${edu.field1 === 'BA' ? 'selected' : ''}>BA</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Department Name</label>
+              <input type="text" value="${edu.field2}" oninput="updateEduVal('${edu.id}', 'field2', this.value)" placeholder="e.g. Computer Science" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div class="col-span-2">
+              <label class="block text-[10px] text-slate-500">University Name</label>
+              <input type="text" value="${edu.field3}" oninput="updateEduVal('${edu.id}', 'field3', this.value)" placeholder="e.g. State University" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Academic Session / Year</label>
+              <input type="text" value="${edu.field4}" oninput="updateEduVal('${edu.id}', 'field4', this.value)" placeholder="e.g. 2020 - 2024" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">CGPA</label>
+              <input type="text" value="${edu.field5}" oninput="updateEduVal('${edu.id}', 'field5', this.value)" placeholder="e.g. 3.90" class="w-full text-xs px-2 py-1 border rounded">
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function updateEduVal(id, key, val) {
+      const entry = educationEntries.find(e => e.id === id);
+      if (entry) {
+        entry[key] = val;
+        updateCV();
+      }
+    }
+
+
+    // Experience Handlers
+    function addExperienceEntry() {
+      const id = 'exp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 4);
+      experienceEntries.push({ id, title: '', company: '', startDate: '', endDate: '', description: '' });
+      renderExperienceInputs();
+      updateCV();
+    }
+
+    function removeExperienceEntry(id) {
+      experienceEntries = experienceEntries.filter(e => e.id !== id);
+      renderExperienceInputs();
+      updateCV();
+    }
+
+    function updateExpVal(id, key, val) {
+      const entry = experienceEntries.find(e => e.id === id);
+      if (entry) {
+        entry[key] = val;
+        updateCV();
+      }
+    }
+
+    function renderExperienceInputs() {
+      const container = document.getElementById('experience-container');
+      container.innerHTML = experienceEntries.map((exp, idx) => {
+        return `
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-600">Experience #${idx + 1}</span>
+              <button type="button" onclick="removeExperienceEntry('${exp.id}')" class="text-xs text-red-500 hover:text-red-700 font-medium">
+                <i class="fa-solid fa-trash-can mr-1"></i> Remove
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-500">Job Title</label>
+                <input type="text" value="${exp.title}" oninput="updateExpVal('${exp.id}', 'title', this.value)" placeholder="e.g. Software Engineer" class="w-full text-xs px-2 py-1 border rounded">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Company Name</label>
+                <input type="text" value="${exp.company}" oninput="updateExpVal('${exp.id}', 'company', this.value)" placeholder="e.g. Tech Corp" class="w-full text-xs px-2 py-1 border rounded">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Start Date</label>
+                <input type="text" value="${exp.startDate}" oninput="updateExpVal('${exp.id}', 'startDate', this.value)" placeholder="e.g. Jan 2022" class="w-full text-xs px-2 py-1 border rounded">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">End Date</label>
+                <input type="text" value="${exp.endDate}" oninput="updateExpVal('${exp.id}', 'endDate', this.value)" placeholder="e.g. Present" class="w-full text-xs px-2 py-1 border rounded">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[10px] text-slate-500">Responsibilities / Achievements</label>
+                <textarea rows="2" oninput="updateExpVal('${exp.id}', 'description', this.value)" placeholder="Developed core web modules, improved site performance..." class="w-full text-xs px-2 py-1 border rounded">${exp.description}</textarea>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+
+    // Languages Handlers (Max 4)
+    function addLanguageEntry() {
+      if (languageEntries.length >= 4) {
+        alert("You can add a maximum of 4 languages.");
+        return;
+      }
+      const id = 'lang_' + Date.now();
+      languageEntries.push({ id, name: '', level: 'Fluent' });
+      renderLanguageInputs();
+      updateCV();
+    }
+
+    function removeLanguageEntry(id) {
+      languageEntries = languageEntries.filter(l => l.id !== id);
+      renderLanguageInputs();
+      updateCV();
+    }
+
+    function updateLangVal(id, key, val) {
+      const entry = languageEntries.find(l => l.id === id);
+      if (entry) {
+        entry[key] = val;
+        updateCV();
+      }
+    }
+
+    function renderLanguageInputs() {
+      const container = document.getElementById('languages-container');
+      container.innerHTML = languageEntries.map((lang, idx) => {
+        return `
+          <div class="flex items-center gap-2 bg-slate-50 p-2 border border-slate-200 rounded">
+            <input type="text" value="${lang.name}" oninput="updateLangVal('${lang.id}', 'name', this.value)" placeholder="e.g. English" class="flex-1 text-xs px-2 py-1 border rounded">
+            <select onchange="updateLangVal('${lang.id}', 'level', this.value)" class="text-xs px-2 py-1 border rounded">
+              <option value="Beginner" ${lang.level === 'Beginner' ? 'selected' : ''}>Beginner</option>
+              <option value="Fluent" ${lang.level === 'Fluent' || !lang.level ? 'selected' : ''}>Fluent</option>
+              <option value="Native" ${lang.level === 'Native' ? 'selected' : ''}>Native</option>
+            </select>
+            <button type="button" onclick="removeLanguageEntry('${lang.id}')" class="text-xs text-red-500 hover:text-red-700 p-1">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      // Toggle Add Button
+      const addBtn = document.getElementById('add-lang-btn');
+      if (languageEntries.length >= 4) {
+        addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+
+    // Switch Preview Template
+    function switchTemplate(template) {
+      activeTemplate = template;
+      const tabClassic = document.getElementById('tab-classic');
+      const tabAts = document.getElementById('tab-ats');
+      const cvClassic = document.getElementById('cv-classic');
+      const cvAts = document.getElementById('cv-ats');
+      const downloadText = document.getElementById('download-btn-text');
+
+      if (template === 'classic') {
+        tabClassic.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
+        tabAts.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+        cvClassic.classList.remove('hidden');
+        cvAts.classList.add('hidden');
+        downloadText.innerText = "Download Classic CV — PDF";
+      } else {
+        tabAts.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
+        tabClassic.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+        cvAts.classList.remove('hidden');
+        cvClassic.classList.add('hidden');
+        downloadText.innerText = "Download ATS CV — PDF";
+      }
+    }
+
+
+    // Theme Selection Handler
+    function setTheme(themeClass) {
+      activeTheme = themeClass;
+      const cvClassic = document.getElementById('cv-classic');
+      cvClassic.className = `a4-page ${themeClass} text-slate-900 flex flex-col`;
+
+      // Highlight active theme swatch
+      document.querySelectorAll('.theme-option').forEach(btn => {
+        btn.classList.remove('ring-2', 'ring-brand-500');
+      });
+      event.currentTarget.classList.add('ring-2', 'ring-brand-500');
+    }
+
+
+    // Dynamic CV Render Engine
+    function updateCV() {
+      const fullname = document.getElementById('input-fullname').value.trim() || 'Alex Morgan';
+      const phone = document.getElementById('input-phone').value.trim();
+      const email = document.getElementById('input-email').value.trim();
+      const address = document.getElementById('input-address').value.trim();
+      const summary = document.getElementById('input-summary').value.trim();
+      const socials = document.getElementById('input-socials').value.trim();
+
+      // Update CLASSIC Template
+      document.getElementById('cv-classic-name').innerText = fullname;
+      
+      // Classic Photo
+      const classicPhotoImg = document.getElementById('cv-classic-photo');
+      const classicPhotoIcon = document.getElementById('cv-classic-photo-icon');
+      if (photoBase64) {
+        classicPhotoImg.src = photoBase64;
+        classicPhotoImg.classList.remove('hidden');
+        classicPhotoIcon.classList.add('hidden');
+      } else {
+        classicPhotoImg.classList.add('hidden');
+        classicPhotoIcon.classList.remove('hidden');
+      }
+
+      // Classic About
+      const classicAboutSec = document.getElementById('cv-classic-about-sec');
+      if (summary) {
+        document.getElementById('cv-classic-summary').innerText = summary;
+        classicAboutSec.classList.remove('hidden');
+      } else {
+        classicAboutSec.classList.add('hidden');
+      }
+
+      // Classic Contact
+      const phoneEl = document.getElementById('cv-classic-phone');
+      const emailEl = document.getElementById('cv-classic-email');
+      const addressEl = document.getElementById('cv-classic-address');
+      const socialsEl = document.getElementById('cv-classic-socials');
+
+      toggleField(phoneEl, phone);
+      toggleField(emailEl, email);
+      toggleField(addressEl, address);
+      toggleField(socialsEl, socials);
+
+      // Classic Skills (Rendered as pill badge boxes)
+      const classicSkillsSec = document.getElementById('cv-classic-skills-sec');
+      const classicSkillsList = document.getElementById('cv-classic-skills-list');
+      if (skillsList.length > 0) {
+        classicSkillsList.innerHTML = skillsList.map(s => `
+          <span class="px-2 py-0.5 text-[10px] font-semibold rounded w-full block" style="background-color: var(--accent-badge-bg); color: var(--accent-badge-text);">
+            ${escapeHTML(s)}
+          </span>
+        `).join('');
+        classicSkillsSec.classList.remove('hidden');
+      } else {
+        classicSkillsSec.classList.add('hidden');
+      }
+
+      // Classic Languages
+      const classicLangSec = document.getElementById('cv-classic-lang-sec');
+      const classicLangList = document.getElementById('cv-classic-lang-list');
+      const validLangs = languageEntries.filter(l => l.name.trim() !== '');
+      if (validLangs.length > 0) {
+        classicLangList.innerHTML = validLangs.map(l => `
+          <div class="flex justify-between items-center">
+            <span class="font-semibold">${escapeHTML(l.name)}</span>
+            <span class="text-[11px] text-slate-500 italic font-medium">${escapeHTML(l.level)}</span>
+          </div>
+        `).join('');
+        classicLangSec.classList.remove('hidden');
+      } else {
+        classicLangSec.classList.add('hidden');
+      }
+
+      // Classic Education
+      const classicEduSec = document.getElementById('cv-classic-edu-sec');
+      const classicEduList = document.getElementById('cv-classic-edu-list');
+      const hasEdu = educationEntries.some(e => e.field1 || e.field2 || e.field3 || e.field4 || e.field5);
+      if (hasEdu) {
+        classicEduList.innerHTML = educationEntries.map(e => formatEduClassic(e)).join('');
+        classicEduSec.classList.remove('hidden');
+      } else {
+        classicEduSec.classList.add('hidden');
+      }
+
+      // Classic Experience
+      const classicExpSec = document.getElementById('cv-classic-exp-sec');
+      const classicExpList = document.getElementById('cv-classic-exp-list');
+      const hasExp = experienceEntries.some(e => e.title || e.company || e.description);
+      if (hasExp) {
+        classicExpList.innerHTML = experienceEntries.map(e => formatExpClassic(e)).join('');
+        classicExpSec.classList.remove('hidden');
+      } else {
+        classicExpSec.classList.add('hidden');
+      }
+
+
+      // Update ATS Template
+      document.getElementById('cv-ats-name').innerText = fullname;
+
+      // ATS Contact Header
+      const atsContact = document.getElementById('cv-ats-contact');
+      const contactItems = [];
+      if (phone) contactItems.push(`Phone: ${escapeHTML(phone)}`);
+      if (email) contactItems.push(`Email: ${escapeHTML(email)}`);
+      if (address) contactItems.push(`Address: ${escapeHTML(address)}`);
+      if (socials) contactItems.push(`Links: ${escapeHTML(socials)}`);
+      atsContact.innerHTML = contactItems.join(' | ');
+
+      // ATS Summary
+      const atsAboutSec = document.getElementById('cv-ats-about-sec');
+      if (summary) {
+        document.getElementById('cv-ats-summary').innerText = summary;
+        atsAboutSec.classList.remove('hidden');
+      } else {
+        atsAboutSec.classList.add('hidden');
+      }
+
+      // ATS Experience
+      const atsExpSec = document.getElementById('cv-ats-exp-sec');
+      const atsExpList = document.getElementById('cv-ats-exp-list');
+      if (hasExp) {
+        atsExpList.innerHTML = experienceEntries.map(e => formatExpATS(e)).join('');
+        atsExpSec.classList.remove('hidden');
+      } else {
+        atsExpSec.classList.add('hidden');
+      }
+
+      // ATS Education
+      const atsEduSec = document.getElementById('cv-ats-edu-sec');
+      const atsEduList = document.getElementById('cv-ats-edu-list');
+      if (hasEdu) {
+        atsEduList.innerHTML = educationEntries.map(e => formatEduATS(e)).join('');
+        atsEduSec.classList.remove('hidden');
+      } else {
+        atsEduSec.classList.add('hidden');
+      }
+
+      // ATS Skills
+      const atsSkillsSec = document.getElementById('cv-ats-skills-sec');
+      if (skillsList.length > 0) {
+        document.getElementById('cv-ats-skills-text').innerText = skillsList.join(' • ');
+        atsSkillsSec.classList.remove('hidden');
+      } else {
+        atsSkillsSec.classList.add('hidden');
+      }
+
+      // ATS Languages
+      const atsLangSec = document.getElementById('cv-ats-lang-sec');
+      if (validLangs.length > 0) {
+        document.getElementById('cv-ats-lang-text').innerText = validLangs.map(l => `${l.name} (${l.level})`).join(', ');
+        atsLangSec.classList.remove('hidden');
+      } else {
+        atsLangSec.classList.add('hidden');
+      }
+    }
+
+    // Helper: Toggle Visibility for Simple Fields
+    function toggleField(el, val) {
+      if (val) {
+        el.querySelector('span').innerText = val;
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+
+    // Formatting Functions for Education
+    function formatEduClassic(e) {
+      if (e.category === 'SSC' || e.category === 'HSC') {
+        if (!e.field3 && !e.field2 && !e.field1) return '';
+        return `
+          <div>
+            <div class="flex justify-between font-bold text-slate-900 text-xs">
+              <span>${escapeHTML(e.category)} ${e.field2 ? ' - ' + escapeHTML(e.field2) : ''}</span>
+              <span class="text-slate-600 font-semibold">${escapeHTML(e.field1)}</span>
+            </div>
+            <p class="text-slate-700 font-medium text-xs mt-0.5">${escapeHTML(e.field3)}</p>
+            ${e.field4 ? `<p class="text-[11px] text-slate-500 font-medium">GPA: ${escapeHTML(e.field4)}</p>` : ''}
+          </div>
+        `;
+      } else if (e.category === 'Diploma') {
+        if (!e.field3 && !e.field2 && !e.field1) return '';
+        return `
+          <div>
+            <div class="flex justify-between font-bold text-slate-900 text-xs">
+              <span>Diploma in ${escapeHTML(e.field2 || 'Engineering')}</span>
+              <span class="text-slate-600 font-semibold">${escapeHTML(e.field1)}</span>
+            </div>
+            <p class="text-slate-700 font-medium text-xs mt-0.5">${escapeHTML(e.field3)}</p>
+            <p class="text-[11px] text-slate-500 font-medium">
+              ${e.field4 ? `Session: ${escapeHTML(e.field4)}` : ''} 
+              ${e.field5 ? ` | CGPA: ${escapeHTML(e.field5)}` : ''}
+            </p>
+          </div>
+        `;
+      } else if (e.category === 'Undergraduate') {
+        if (!e.field3 && !e.field2 && !e.field1) return '';
+        return `
+          <div>
+            <div class="flex justify-between font-bold text-slate-900 text-xs">
+              <span>${escapeHTML(e.field1 || 'Degree')} in ${escapeHTML(e.field2)}</span>
+              <span class="text-slate-600 font-semibold">${escapeHTML(e.field4)}</span>
+            </div>
+            <p class="text-slate-700 font-medium text-xs mt-0.5">${escapeHTML(e.field3)}</p>
+            ${e.field5 ? `<p class="text-[11px] text-slate-500 font-medium">CGPA: ${escapeHTML(e.field5)}</p>` : ''}
+          </div>
+        `;
+      }
+      return '';
+    }
+
+    function formatEduATS(e) {
+      if (e.category === 'SSC' || e.category === 'HSC') {
+        if (!e.field3 && !e.field2) return '';
+        return `
+          <div>
+            <p class="font-bold text-slate-900">${escapeHTML(e.category)} ${e.field2 ? '(' + escapeHTML(e.field2) + ')' : ''} — ${escapeHTML(e.field3)} <span class="font-semibold text-slate-600">(${escapeHTML(e.field1)})</span></p>
+            ${e.field4 ? `<p class="text-slate-700 font-medium">GPA: ${escapeHTML(e.field4)}</p>` : ''}
+          </div>
+        `;
+      } else if (e.category === 'Diploma') {
+        if (!e.field3) return '';
+        return `
+          <div>
+            <p class="font-bold text-slate-900">Diploma in ${escapeHTML(e.field2)} — ${escapeHTML(e.field3)} <span class="font-semibold text-slate-600">(${escapeHTML(e.field1)})</span></p>
+            <p class="text-slate-700 font-medium">${e.field4 ? 'Session: ' + escapeHTML(e.field4) : ''} ${e.field5 ? '| CGPA: ' + escapeHTML(e.field5) : ''}</p>
+          </div>
+        `;
+      } else if (e.category === 'Undergraduate') {
+        if (!e.field3) return '';
+        return `
+          <div>
+            <p class="font-bold text-slate-900">${escapeHTML(e.field1)} in ${escapeHTML(e.field2)} — ${escapeHTML(e.field3)} <span class="font-semibold text-slate-600">(${escapeHTML(e.field4)})</span></p>
+            ${e.field5 ? `<p class="text-slate-700 font-medium">CGPA: ${escapeHTML(e.field5)}</p>` : ''}
+          </div>
+        `;
+      }
+      return '';
+    }
+
+    // Formatting Functions for Experience
+    function formatExpClassic(e) {
+      if (!e.title && !e.company) return '';
+      return `
+        <div>
+          <div class="flex justify-between font-bold text-slate-900 text-xs">
+            <span>${escapeHTML(e.title)} ${e.company ? ' at ' + escapeHTML(e.company) : ''}</span>
+            <span class="text-slate-600 font-semibold">${escapeHTML(e.startDate)} ${e.endDate ? ' - ' + escapeHTML(e.endDate) : ''}</span>
+          </div>
+          ${e.description ? `<p class="text-xs text-slate-700 mt-1.5 leading-relaxed whitespace-pre-line">${escapeHTML(e.description)}</p>` : ''}
+        </div>
+      `;
+    }
+
+    function formatExpATS(e) {
+      if (!e.title && !e.company) return '';
+      return `
+        <div>
+          <p class="font-bold text-slate-900">${escapeHTML(e.title)} — ${escapeHTML(e.company)} <span class="font-semibold text-slate-600">(${escapeHTML(e.startDate)} - ${escapeHTML(e.endDate)})</span></p>
+          ${e.description ? `<p class="text-slate-700 mt-1 leading-relaxed whitespace-pre-line">${escapeHTML(e.description)}</p>` : ''}
+        </div>
+      `;
+    }
+
+    // Utility to prevent HTML injection
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+
+    // Smooth Scroll to Preview on Mobile
+    function scrollToPreview() {
+      document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // A4 Single Page PDF Generator
+    function downloadPDF() {
+      const element = activeTemplate === 'classic' ? document.getElementById('cv-classic') : document.getElementById('cv-ats');
+      const fullname = document.getElementById('input-fullname').value.trim() || 'Alex_Morgan';
+      const filename = `${fullname.replace(/\s+/g, '_')}_CV.pdf`;
+
+      if (element.scrollHeight > element.clientHeight + 10) {
+        alert("Warning: Your content is slightly extensive for a single page. It has been scaled to automatically fit into one A4 page.");
+      }
+
+      const opt = {
+        margin: 0,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // Copy & Share Functions
+    function copyWebsiteLink() {
+      const url = window.location.href;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(showShareToast);
+      } else {
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showShareToast();
+      }
+    }
+
+    function shareWebsite() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Make My CV  - Professional CV Maker',
+          text: 'Create clean, modern, and ATS-friendly CVs in seconds!',
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        copyWebsiteLink();
+      }
+    }
+
+    function showShareToast() {
+      const toast = document.getElementById('share-toast');
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
